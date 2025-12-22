@@ -1,14 +1,38 @@
 #!/bin/bash
 
-echo "🚀 Starting publish script..."
+# Default to quiet mode
+SHOW_LOGS=false
 
-# Ensure we are in the project root (optional check, assuming ran from root)
+# Check for flag
+for arg in "$@"; do
+  if [ "$arg" == "--show-logs" ]; then
+    SHOW_LOGS=true
+    break
+  fi
+done
+
+# Helper for logging (only prints if SHOW_LOGS is true)
+log_info() {
+    if [ "$SHOW_LOGS" = true ]; then
+        echo "$@"
+    fi
+}
+
+# Helper to run commands
+run_cmd() {
+    if [ "$SHOW_LOGS" = true ]; then
+        "$@"
+    else
+        "$@" > /dev/null 2>&1
+    fi
+}
+
+log_info "🚀 Starting publish script..."
 
 # Step 1: Git Add
-echo "--------------------------------"
-echo "Step 1: git add ."
-git add .
-if [ $? -eq 0 ]; then
+log_info "--------------------------------"
+log_info "Step 1: git add ."
+if run_cmd git add .; then
     echo "✅ git add complete"
 else
     echo "❌ git add failed"
@@ -16,21 +40,25 @@ else
 fi
 
 # Step 2: Extract Version and Commit
-echo "--------------------------------"
-echo "Step 2: Checking version and committing"
+log_info "--------------------------------"
+log_info "Step 2: Checking version and committing"
 
 if [ -f "android/version.json" ]; then
-    # Extract version using awk to avoid jq dependency
     VERSION=$(awk -F '"' '/"version":/ {print $4}' android/version.json)
     
     if [ -n "$VERSION" ]; then
-        echo "Found version: $VERSION"
-        git commit -m "added new version $VERSION"
+        log_info "Found version: $VERSION"
         
-        if [ $? -eq 0 ]; then
+        # Try to commit
+        if run_cmd git commit -m "added new version $VERSION"; then
             echo "✅ git commit complete"
         else
-            echo "⚠️  git commit returned non-zero (no changes to commit?)"
+            # If commit fails (e.g. no changes), we notify but don't exit script strictly, 
+            # though usually we want to stop if we expected a commit. 
+            # However, git push might still be useful if we had previous commits.
+            # But typically this script is for a flow. 
+            # I will show error.
+            echo "❌ git commit failed (or nothing to commit)"
         fi
     else
         echo "❌ Could not extract version from android/version.json"
@@ -42,15 +70,14 @@ else
 fi
 
 # Step 3: Git Push
-echo "--------------------------------"
-echo "Step 3: git push"
-git push
-if [ $? -eq 0 ]; then
+log_info "--------------------------------"
+log_info "Step 3: git push"
+if run_cmd git push; then
     echo "✅ git push complete"
 else
     echo "❌ git push failed"
     exit 1
 fi
 
-echo "--------------------------------"
-echo "🎉 Script finished successfully"
+log_info "--------------------------------"
+log_info "🎉 Script finished successfully"
