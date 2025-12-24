@@ -44,7 +44,7 @@ log_info "--------------------------------"
 log_info "Step 2: Checking version and committing"
 
 if [ -f "android/version.json" ]; then
-    VERSION=$(awk -F '"' '/"version":/ {print $4}' android/version.json)
+    VERSION=$(grep '"version":' android/version.json | awk -F ':' '{print $2}' | tr -d '", ')
     
     if [ -n "$VERSION" ]; then
         log_info "Found version: $VERSION"
