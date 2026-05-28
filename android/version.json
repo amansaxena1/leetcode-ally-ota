@@ -1,11 +1,5 @@
 {
-<<<<<<< HEAD
-  "version": "0.0.42",
+  "version": "1.0.1",
   "bundleUrl": "https://amansaxena1.github.io/leetcode-ally-ota/android/update.zip",
-  "description": "Update version 0.0.42 generated at 2026-05-28T17:31:13.655Z"
-=======
-  "version": "0.0.50",
-  "bundleUrl": "https://amansaxena1.github.io/leetcode-ally-ota/android/update.zip",
-  "description": "Update version 0.0.50 generated at 2026-01-12T18:13:39.022Z"
->>>>>>> 656c249de29d4c1d6903f8612feded753098d92f
+  "description": "Update version 1.0.1 generated at 2026-05-28T17:34:40.808Z"
 }
